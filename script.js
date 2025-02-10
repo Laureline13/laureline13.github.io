@@ -89,6 +89,15 @@ function sauvegarderCommande() {
     a.click();
 }
 
+function lireFichierBase64(fichier, callback) {
+    let lecteur = new FileReader();
+    lecteur.onload = function (e) {
+        callback(e.target.result);
+    };
+    lecteur.readAsDataURL(fichier);
+}
+
+
 function ouvrirPagePaiement() {
     let nom = document.getElementById("nom").value;
     let prenom = document.getElementById("prenom").value;
@@ -119,17 +128,53 @@ function ouvrirPagePaiement() {
             total += med.prix * quantite;
         }
     });
-
-    let documents = {
-        ordonnance: document.getElementById("ordonnance").files.length > 0 ? document.getElementById("ordonnance").files[0].name : "Non fournie",
-        carteVitale: document.getElementById("carteVitale").files.length > 0 ? document.getElementById("carteVitale").files[0].name : "Non fournie",
-        mutuelle: document.getElementById("mutuelle").files.length > 0 ? document.getElementById("mutuelle").files[0].name : "Non fournie"
-    };
-
-       localStorage.setItem("recapCommande", JSON.stringify({ 
-        nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents 
-    }));
     
-    sauvegarderCommander();
-    window.location.href = "paiement.html";
+    let ordonnanceFile = document.getElementById("ordonnance").files[0];
+    let carteVitaleFile = document.getElementById("carteVitale").files[0];
+    let mutuelleFile = document.getElementById("mutuelle").files[0];
+    
+    let documents = {};
+
+     function sauvegardeFinale() {
+        let recap = { nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents };
+        let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+        commandes.push(recap);
+        localStorage.setItem("commandes", JSON.stringify(commandes));
+
+        window.location.href = "paiement.html";
+    }
+    let fichiersCharge = 0;
+    let totalFichiers = [ordonnanceFile, carteVitaleFile, mutuelleFile].filter(f => f).length;
+
+    function fichierTermine() {
+        fichiersCharge++;
+        if (fichiersCharge === totalFichiers) {
+            sauvegardeFinale();
+        }
+    }
+
+    if (ordonnanceFile) {
+        lireFichierBase64(ordonnanceFile, (base64) => {
+            documents.ordonnance = base64;
+            fichierTermine();
+        });
+    }
+
+    if (carteVitaleFile) {
+        lireFichierBase64(carteVitaleFile, (base64) => {
+            documents.carteVitale = base64;
+            fichierTermine();
+        });
+    }
+
+    if (mutuelleFile) {
+        lireFichierBase64(mutuelleFile, (base64) => {
+            documents.mutuelle = base64;
+            fichierTermine();
+        });
+    }
+
+    if (totalFichiers === 0) {
+        sauvegardeFinale();
+    }
 };

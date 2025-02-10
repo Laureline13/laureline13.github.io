@@ -113,9 +113,11 @@ function ouvrirPagePaiement() {
         nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents 
     }));
 
+    sauvegarderCommande(); // Enregistre la commande dans un fichier JSON
     window.location.href = "paiement.html";
+};
 
-    function sauvegarderCommande() {
+function sauvegarderCommande() {
     let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
     let recap = JSON.parse(localStorage.getItem("recapCommande"));
 
@@ -131,16 +133,5 @@ function ouvrirPagePaiement() {
     a.download = "commandes.json";
     a.click();
 }
-
-// Appelle cette fonction après avoir sauvegardé la commande
-ouvrirPagePaiement = () => {
-    // Code existant...
-    localStorage.setItem("recapCommande", JSON.stringify({ 
-        nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents 
-    }));
-
-    sauvegarderCommande(); // Enregistre la commande dans un fichier JSON
-    window.location.href = "paiement.html";
-};
 
 }

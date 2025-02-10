@@ -72,6 +72,24 @@ async function rechercherPharmacies() {
     medContainer.appendChild(boutonPaiement);
 }
 
+function sauvegarderCommande() {
+    let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+    let recap = JSON.parse(localStorage.getItem("recapCommande"));
+
+    if (!recap) return;
+
+    commandes.push(recap);
+    localStorage.setItem("commandes", JSON.stringify(commandes));
+
+    // Télécharger un fichier JSON avec les commandes
+    let blob = new Blob([JSON.stringify(commandes, null, 2)], { type: "application/json" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "commandes.json";
+    a.click();
+}
+
+
 function ouvrirPagePaiement() {
     let nom = document.getElementById("nom").value;
     let prenom = document.getElementById("prenom").value;
@@ -116,22 +134,5 @@ function ouvrirPagePaiement() {
     sauvegarderCommande(); // Enregistre la commande dans un fichier JSON
     window.location.href = "paiement.html";
 };
-
-function sauvegarderCommande() {
-    let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-    let recap = JSON.parse(localStorage.getItem("recapCommande"));
-
-    if (!recap) return;
-
-    commandes.push(recap);
-    localStorage.setItem("commandes", JSON.stringify(commandes));
-
-    // Télécharger un fichier JSON avec les commandes
-    let blob = new Blob([JSON.stringify(commandes, null, 2)], { type: "application/json" });
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "commandes.json";
-    a.click();
-}
 
 }

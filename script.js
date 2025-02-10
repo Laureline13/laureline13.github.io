@@ -134,5 +134,3 @@ function ouvrirPagePaiement() {
     sauvegarderCommande(); // Enregistre la commande dans un fichier JSON
     window.location.href = "paiement.html";
 };
-
-}

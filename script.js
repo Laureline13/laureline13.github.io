@@ -39,6 +39,7 @@ async function rechercherPharmacies() {
     let medicaments = [
         { nom: "Paracétamol", prix: 2.50 },
         { nom: "Ibuprofène", prix: 3.00 }
+        { nom: "CBD", prix: 5,00}
     ];
 
     medContainer.innerHTML += "<h3>Choisissez vos articles :</h3>";

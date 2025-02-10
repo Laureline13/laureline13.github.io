@@ -129,6 +129,7 @@ function ouvrirPagePaiement() {
        localStorage.setItem("recapCommande", JSON.stringify({ 
         nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents 
     }));
-
+    
+    sauvegarderCommander();
     window.location.href = "paiement.html";
 };

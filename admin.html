@@ -14,33 +14,49 @@
         function afficherCommandes() {
             let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
             let liste = document.getElementById("liste-commandes");
-            liste.innerHTML = "";
+    liste.innerHTML = "";
 
             commandes.forEach((cmd, index) => {
-                let li = document.createElement("li");
-                li.innerHTML = `
-                    <strong>${cmd.nom} ${cmd.prenom}</strong> - ${cmd.total.toFixed(2)}€
-                    <button onclick="supprimerCommande(${index})">🗑️</button>
-                `;
-                liste.appendChild(li);
-            });
-        }
+            let li = document.createElement("li");
+            li.innerHTML = `
+                <strong>${cmd.nom} ${cmd.prenom}</strong> - ${cmd.total.toFixed(2)}€
+                <button onclick="supprimerCommande(${index})">🗑️</button>
+                <button onclick="modifierCommande(${index})">✏️</button>
+            `;
+            liste.appendChild(li);
+        });
+}
 
-        function supprimerCommande(index) {
-            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-            commandes.splice(index, 1);
-            localStorage.setItem("commandes", JSON.stringify(commandes));
-            afficherCommandes();
-        }
+function modifierCommande(index) {
+    let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+    let cmd = commandes[index];
 
-        function telechargerJSON() {
-            let commandes = localStorage.getItem("commandes") || "[]";
-            let blob = new Blob([commandes], { type: "application/json" });
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = "commandes.json";
-            a.click();
-        }
+    let nom = prompt("Modifier le nom :", cmd.nom);
+    let prenom = prompt("Modifier le prénom :", cmd.prenom);
+    let adresse = prompt("Modifier l'adresse :", cmd.adresse);
+
+    if (nom && prenom && adresse) {
+        commandes[index] = { ...cmd, nom, prenom, adresse };
+        localStorage.setItem("commandes", JSON.stringify(commandes));
+        afficherCommandes();
+    }
+}
+
+function supprimerCommande(index) {
+    let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+    commandes.splice(index, 1);
+    localStorage.setItem("commandes", JSON.stringify(commandes));
+    afficherCommandes();
+}
+
+function telechargerJSON() {
+    let commandes = localStorage.getItem("commandes") || "[]";
+    let blob = new Blob([commandes], { type: "application/json" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "commandes.json";
+    a.click();
+}
 
         window.onload = afficherCommandes;
     </script>

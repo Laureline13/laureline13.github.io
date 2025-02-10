@@ -88,7 +88,8 @@ function ouvrirPagePaiement() {
 
     let medicaments = [
         { nom: "Paracétamol", prix: 2.50 },
-        { nom: "Ibuprofène", prix: 3.00 }
+        { nom: "Ibuprofène", prix: 3.00 },
+        { nom: "CBD", prix: 5.00 }
     ];
     
     let total = 5.00; // Frais de livraison

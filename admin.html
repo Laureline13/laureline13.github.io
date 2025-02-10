@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commandes Admin</title>
+</head>
+<body>
+    <h1>Liste des commandes</h1>
+    <button onclick="telechargerJSON()">Télécharger les commandes</button>
+    <ul id="liste-commandes"></ul>
+
+    <script>
+        function afficherCommandes() {
+            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+            let liste = document.getElementById("liste-commandes");
+            liste.innerHTML = "";
+
+            commandes.forEach((cmd, index) => {
+                let li = document.createElement("li");
+                li.innerHTML = `
+                    <strong>${cmd.nom} ${cmd.prenom}</strong> - ${cmd.total.toFixed(2)}€
+                    <button onclick="supprimerCommande(${index})">🗑️</button>
+                `;
+                liste.appendChild(li);
+            });
+        }
+
+        function supprimerCommande(index) {
+            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
+            commandes.splice(index, 1);
+            localStorage.setItem("commandes", JSON.stringify(commandes));
+            afficherCommandes();
+        }
+
+        function telechargerJSON() {
+            let commandes = localStorage.getItem("commandes") || "[]";
+            let blob = new Blob([commandes], { type: "application/json" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "commandes.json";
+            a.click();
+        }
+
+        window.onload = afficherCommandes;
+    </script>
+</body>
+</html>

@@ -135,7 +135,7 @@ function ouvrirPagePaiement() {
     
     let documents = {};
 
-     function sauvegardeFinale() {
+    function sauvegardeFinale() {
         let recap = { nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents };
         let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
         commandes.push(recap);

@@ -177,4 +177,6 @@ function ouvrirPagePaiement() {
     if (totalFichiers === 0) {
         sauvegardeFinale();
     }
+    localStorage.setItem("recapCommande", JSON.stringify(recap));
+    window.location.href = "paiement.html";
 };

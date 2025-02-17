@@ -23,3 +23,15 @@ app.post("/upload", upload.single("file"), (req, res) => {
 });
 
 app.listen(3000, () => console.log("Serveur démarré sur http://localhost:3000"));
+const path = require("path");
+
+// Servir le dossier "uploads"
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Obtenir la liste des fichiers stockés
+app.get("/fichiers", (req, res) => {
+    fs.readdir("uploads/", (err, files) => {
+        if (err) return res.status(500).json({ error: "Erreur lors de la lecture des fichiers" });
+        res.json(files.map(file => ({ name: file, url: `/uploads/${file}` })));
+    });
+});

@@ -139,8 +139,8 @@ function ouvrirPagePaiement() {
         let recap = { nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents };
         let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
         commandes.push(recap);
-        localStorage.setItem("commandes", JSON.stringify(commandes));
-
+        
+        localStorage.setItem("recapCommande", JSON.stringify(recap));
         window.location.href = "paiement.html";
     }
     let fichiersCharge = 0;

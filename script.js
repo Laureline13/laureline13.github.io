@@ -89,15 +89,6 @@ function sauvegarderCommande() {
     a.click();
 }
 
-function lireFichierBase64(fichier, callback) {
-    let lecteur = new FileReader();
-    lecteur.onload = function (e) {
-        callback(e.target.result);
-    };
-    lecteur.readAsDataURL(fichier);
-}
-
-
 function ouvrirPagePaiement() {
     let nom = document.getElementById("nom").value;
     let prenom = document.getElementById("prenom").value;
@@ -139,10 +130,27 @@ function ouvrirPagePaiement() {
         let recap = { nom, prenom, adresse, pharmacie: pharmacieChoisie, commande, total, documents };
         let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
         commandes.push(recap);
-        
         localStorage.setItem("recapCommande", JSON.stringify(recap));
+        
         window.location.href = "paiement.html";
     }
+
+    async function traiterDocuments() {
+        if (ordonnanceFile) {
+            documents.ordonnance = await envoyerFichierAuServeur(ordonnanceFile);
+        }
+        if (carteVitaleFile) {
+            documents.carteVitale = await envoyerFichierAuServeur(carteVitaleFile);
+        }
+        if (mutuelleFile) {
+            documents.mutuelle = await envoyerFichierAuServeur(mutuelleFile);
+        }
+        sauvegardeFinale();
+    }
+
+    // Lancer le traitement des fichiers
+    traiterDocuments();
+
     let fichiersCharge = 0;
     let totalFichiers = [ordonnanceFile, carteVitaleFile, mutuelleFile].filter(f => f).length;
 
@@ -179,4 +187,17 @@ function ouvrirPagePaiement() {
     }
     localStorage.setItem("recapCommande", JSON.stringify(recap));
     window.location.href = "paiement.html";
+}
+
+async function envoyerFichierAuServeur(file) {
+    let formData = new FormData();
+    formData.append("file", file);
+
+    let response = await fetch("http://localhost:3000/upload", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await response.json();
+    return data.path; // Retourne le chemin du fichier stocké
 };

@@ -1,28 +1,32 @@
 const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const upload = multer({ storage: multer.diskStorage({
-    destination: (_, __, cb) => cb(null, "uploads/"),
-    filename: (_, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-}) });
+const stockage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, "uploads/"),
+    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+});
+
+const upload = multer({
+    storage: stockage,
+    fileFilter: (req, file, cb) => {
+        let types = ["image/png", "image/jpeg", "application/pdf"];
+        if (types.includes(file.mimetype)) cb(null, true);
+        else cb(new Error("Format de fichier non autorisé"));
+    }
+});
 
 app.post("/upload", upload.single("file"), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: "Aucun fichier reçu" });
     res.json({ filename: req.file.filename, path: "/uploads/" + req.file.filename });
 });
 
-app.get("/fichiers", (_, res) => {
-    fs.readdir("uploads/", (err, files) => {
-        if (err) return res.status(500).json({ error: "Erreur lors de la lecture des fichiers" });
-        res.json(files.map(file => ({ name: file, url: `/uploads/${file}` })));
-    });
-});
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(3000, () => console.log("Serveur démarré sur http://localhost:3000"));

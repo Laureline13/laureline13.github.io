@@ -4,106 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Gestion des Commandes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .button { background-color: #007bff; color: white; padding: 8px; border: none; cursor: pointer; }
+        .button-danger { background-color: #dc3545; }
+    </style>
 </head>
 <body>
     <h1>📦 Liste des commandes</h1>
     <ul id="liste-commandes"></ul>
-
     <h1>📂 Fichiers stockés</h1>
-    <button onclick="chargerFichiers()">🔄 Rafraîchir</button>
+    <button class="button" onclick="chargerFichiers()">🔄 Rafraîchir</button>
     <ul id="liste-fichiers"></ul>
-
     <script>
-        // Charger les commandes depuis localStorage
         function afficherCommandes() {
-            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-            let liste = document.getElementById("liste-commandes");
-            liste.innerHTML = "";
-
-            commandes.forEach((cmd, index) => {
-            let li = document.createElement("li");
-            li.innerHTML = `
-                <strong>${cmd.nom} ${cmd.prenom}</strong> - ${cmd.total.toFixed(2)}€
-                <button onclick="supprimerCommande(${index})">🗑️</button>
-                <button onclick="voirDetails(${index})">👁️ Voir Détails</button>
-                <button onclick="modifierCommande(${index})">✏️</button>
-            `;
-            liste.appendChild(li);
-            });
+            fetch("http://localhost:3000/commandes")
+                .then(response => response.json())
+                .then(commandes => {
+                    let liste = document.getElementById("liste-commandes");
+                    liste.innerHTML = commandes.map((cmd, index) => `
+                        <li>
+                            <strong>${cmd.nom} ${cmd.prenom}</strong> - ${cmd.total.toFixed(2)}€
+                            <button class="button" onclick="voirDetails(${index})">👁️ Voir</button>
+                            <button class="button button-danger" onclick="supprimerCommande(${index})">🗑️</button>
+                        </li>
+                    `).join("");
+                });
         }
-
-        // Voir les détails d'une commande
+        
         function voirDetails(index) {
-            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-            let cmd = commandes[index];
-
-            let details = `Commande de ${cmd.nom} ${cmd.prenom} - Total : ${cmd.total.toFixed(2)}€\n`;
-            details += `📍 Adresse : ${cmd.adresse}\n`;
-            details += `🏥 Pharmacie : ${cmd.pharmacie}\n\n`;
-
-            details += "🛒 Médicaments commandés :\n";
-            cmd.commande.forEach(item => {
-                details += `- ${item.nom} x ${item.quantite} (${item.prix.toFixed(2)}€)\n`;
-            });
-
-            details += "\n📂 Documents fournis :\n";
-            if (cmd.documents.ordonnance) details += `📜 Ordonnance : <a href="${cmd.documents.ordonnance}" target="_blank">Voir</a>\n`;
-            if (cmd.documents.carteVitale) details += `🪪 Carte Vitale : <a href="${cmd.documents.carteVitale}" target="_blank">Voir</a>\n`;
-            if (cmd.documents.mutuelle) details += `📄 Mutuelle : <a href="${cmd.documents.mutuelle}" target="_blank">Voir</a>\n`;
-
-            alert(details);
+            fetch("http://localhost:3000/commandes")
+                .then(response => response.json())
+                .then(commandes => alert(JSON.stringify(commandes[index], null, 2)));
         }
 
-        // Modifier les fichiers depuis le serveur
-        function modifierCommande(index) {
-            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-            let cmd = commandes[index];
-
-            let nom = prompt("Modifier le nom :", cmd.nom);
-            let prenom = prompt("Modifier le prénom :", cmd.prenom);
-            let adresse = prompt("Modifier l'adresse :", cmd.adresse);
-
-            if (nom && prenom && adresse) {
-                commandes[index] = { ...cmd, nom, prenom, adresse };
-                localStorage.setItem("commandes", JSON.stringify(commandes));
-                afficherCommandes();
-            }
-        }
-
-        // Supprimer une commande
         function supprimerCommande(index) {
-            let commandes = JSON.parse(localStorage.getItem("commandes")) || [];
-            commandes.splice(index, 1);
-            localStorage.setItem("commandes", JSON.stringify(commandes));
-            afficherCommandes();
+            fetch(`http://localhost:3000/commandes/${index}`, { method: "DELETE" })
+                .then(() => afficherCommandes());
         }
 
-          // Charger les fichiers depuis le serveur
-          function chargerFichiers() {
+        function chargerFichiers() {
             fetch("http://localhost:3000/fichiers")
                 .then(response => response.json())
                 .then(fichiers => {
                     let liste = document.getElementById("liste-fichiers");
-                    liste.innerHTML = "";
-
-                    fichiers.forEach(file => {
-                        let li = document.createElement("li");
-                        li.innerHTML = `<a href="http://localhost:3000/uploads/${file.name}" target="_blank">${file.name}</a>`;
-                        liste.appendChild(li);
-                    });
-                })
-                .catch(error => console.error("Erreur lors du chargement des fichiers :", error));
+                    liste.innerHTML = fichiers.map(file => `<li><a href="http://localhost:3000/uploads/${file.name}" target="_blank">${file.name}</a></li>`).join("");
+                });
         }
-        
-       // function telechargerJSON() {
-       //     let commandes = localStorage.getItem("commandes") || "[]";
-       //     let blob = new Blob([commandes], { type: "application/json" });
-       //     let a = document.createElement("a");
-       //     a.href = URL.createObjectURL(blob);
-       //     a.download = "commandes.json";
-       //     a.click();
-       // }
-        // Charger les commandes et fichiers au chargement de la page
+
         window.onload = function () {
             afficherCommandes();
             chargerFichiers();

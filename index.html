@@ -6,29 +6,24 @@
     <title>HealthWings</title>
     <link rel="icon" type="image/png" href="Favicon.jpeg">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
         .container { max-width: 600px; margin: auto; }
-        .button { background-color: #007bff; color: white; padding: 10px; border: none; cursor: pointer; }
+        .button { background-color: #007bff; color: white; padding: 10px; border: none; cursor: pointer; margin-top: 10px; }
+        .input-field { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
         .logo { display: block; margin: 0 auto 20px; width: 150px; }
     </style>
 </head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <body>
     <div class="container">
         <img src="logo.jpeg" alt="HealthWings Logo" class="logo">
         <h1>HealthWings</h1>
-        <label for="nom">Nom :</label>
-        <input type="text" id="nom" placeholder="Votre nom"><br>
-        <label for="prenom">Prénom :</label>
-        <input type="text" id="prenom" placeholder="Votre prénom"><br>
-        <label for="adresse">Adresse de livraison :</label>
-        <input type="text" id="adresse" placeholder="Votre adresse"><br>
+        <input type="text" id="nom" class="input-field" placeholder="Votre nom">
+        <input type="text" id="prenom" class="input-field" placeholder="Votre prénom">
+        <input type="text" id="adresse" class="input-field" placeholder="Votre adresse">
         <button class="button" onclick="rechercherPharmacies()">Rechercher</button>
-
         <h2>Médicaments disponibles :</h2>
         <div id="medicaments"></div>
     </div>
-
-    <script src="script.js"></script> <!-- Fichier JS externe -->
+    <script src="script.js"></script>
 </body>
 </html>

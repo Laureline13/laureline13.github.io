@@ -9,69 +9,35 @@
 <body>
     <h1>Récapitulatif de la commande</h1>
     <div id="recapitulatif"></div>
-    <h2>Documents fournis</h2>
-    <div id="documents"></div>
     <button onclick="genererFacture()">Télécharger la facture</button>
 
     <script>
         function chargerRecapitulatif() {
             let recap = JSON.parse(localStorage.getItem("recapCommande"));
-            if (!recap) {
-                document.getElementById("recapitulatif").innerHTML = "Aucune commande trouvée.";
-                return;
-            }
-    
-            let contenu = `<p><strong>Nom :</strong> ${recap.nom}</p>`;
-            contenu += `<p><strong>Prénom :</strong> ${recap.prenom}</p>`;
-            contenu += `<p><strong>Adresse de livraison :</strong> ${recap.adresse}</p>`;
-            contenu += `<p><strong>Pharmacie :</strong> ${recap.pharmacie}</p>`;
-            recap.commande.forEach(item => {
-                contenu += `<p>${item.nom} x ${item.quantite} = ${item.prix.toFixed(2)}€</p>`;
-            });
-            contenu += `<p><strong>Frais de livraison :</strong> 5.00€</p>`;
-            contenu += `<p><strong>Total à payer :</strong> ${recap.total.toFixed(2)}€</p>`;
+            if (!recap) return document.getElementById("recapitulatif").innerHTML = "Aucune commande trouvée.";
 
-            document.getElementById("recapitulatif").innerHTML = contenu;
-
-            let docs = `<p>Ordonnance : ${recap.documents.ordonnance}</p>`;
-            docs += `<p>Carte Vitale : ${recap.documents.carteVitale}</p>`;
-            docs += `<p>Mutuelle : ${recap.documents.mutuelle}</p>`;
-            document.getElementById("documents").innerHTML = docs;
+            document.getElementById("recapitulatif").innerHTML = `
+                <p><strong>Nom :</strong> ${recap.nom}</p>
+                <p><strong>Prénom :</strong> ${recap.prenom}</p>
+                <p><strong>Adresse :</strong> ${recap.adresse}</p>
+                <p><strong>Pharmacie :</strong> ${recap.pharmacie}</p>
+                ${recap.commande.map(item => `<p>${item.nom} x ${item.quantite} = ${item.prix.toFixed(2)}€</p>`).join("")}
+                <p><strong>Total :</strong> ${recap.total.toFixed(2)}€</p>
+            `;
         }
 
-        
         function genererFacture() {
             let { jsPDF } = window.jspdf;
             let doc = new jsPDF();
             let recap = JSON.parse(localStorage.getItem("recapCommande"));
-            if (!recap) {
-                alert("Aucune commande trouvée pour générer la facture.");
-                return;
-            }
-            
+            if (!recap) return alert("Aucune commande trouvée.");
+
             doc.text("Facture", 10, 10);
-            doc.text(`Pharmacie : ${recap.pharmacie}`, 10, 20);
-            let y = 30;
-            recap.commande.forEach(item => {
-                doc.text(`${item.nom} x ${item.quantite} = ${item.prix.toFixed(2)}€`, 10, y);
-                y += 10;
-            });
-            doc.text(`Frais de livraison : 5.00€`, 10, y);
-            y += 10;
-            doc.text(`Total : ${recap.total.toFixed(2)}€`, 10, y);
-            y += 10;
-            doc.text("Documents fournis:", 10, y);
-            y += 10;
-            doc.text(`Ordonnance : ${recap.documents.ordonnance}`, 10, y);
-            y += 10;
-            doc.text(`Carte Vitale : ${recap.documents.carteVitale}`, 10, y);
-            y += 10;
-            doc.text(`Mutuelle : ${recap.documents.mutuelle}`, 10, y);
-            y += 10;
-            doc.text("Paiement : Confirmé", 10, y);
+            recap.commande.forEach((item, i) => doc.text(`${item.nom} x ${item.quantite} = ${item.prix.toFixed(2)}€`, 10, 20 + i * 10));
+            doc.text(`Total : ${recap.total.toFixed(2)}€`, 10, 50);
             doc.save("facture.pdf");
         }
-        
+
         window.onload = chargerRecapitulatif;
     </script>
 </body>
